@@ -14,6 +14,7 @@ import com.ttit.zhihuibeijing.R;
 import com.ttit.zhihuibeijing.activity.HomeActivity;
 import com.ttit.zhihuibeijing.base.BaseFragment;
 import com.ttit.zhihuibeijing.bean.NewsCenterBean;
+import com.ttit.zhihuibeijing.fragment.NewsCenterFragment;
 import com.ttit.zhihuibeijing.utils.MyLogger;
 
 import java.util.List;
@@ -78,8 +79,12 @@ public class HomeMenuAdaper extends RecyclerView.Adapter {
                     //修改对应tab页面的标题
                     BaseFragment baseFragment = ((HomeActivity) context).getCurrentTabFragment();
                     baseFragment.setTitle(newsCenterMenuBean.title);
+                    if (baseFragment instanceof NewsCenterFragment){
+                        NewsCenterFragment newsCenterFragment = (NewsCenterFragment) baseFragment;
+                        //切换内容
+                        newsCenterFragment.switchContent(i);
+                    }
                 }
-
                 //关闭侧滑菜单
                 ((HomeActivity) context).mSlidingMenu.toggle();
             }

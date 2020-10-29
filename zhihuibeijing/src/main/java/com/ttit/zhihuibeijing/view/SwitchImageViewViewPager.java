@@ -9,6 +9,7 @@ import com.ttit.zhihuibeijing.base.NewsCenterContentTabPager;
 import com.ttit.zhihuibeijing.utils.MyLogger;
 import com.ttit.zhihuibeijing.utils.MyToast;
 
+
 /**
  * Created by Apple on 2016/9/27.
  */
@@ -16,7 +17,7 @@ public class SwitchImageViewViewPager extends ViewPager {
     private static final String TAG = "SwitchImageViewViewPager";
 
     //控制轮播图开始和停止的对象
-    private NewsCenterContentTabPager tabPager;
+    public NewsCenterContentTabPager tabPager;
     //在哪里调用？ 在加载数据成功之后，就可以把该对象设置过来
     public void setTabPager(NewsCenterContentTabPager tabPager) {
         this.tabPager = tabPager;

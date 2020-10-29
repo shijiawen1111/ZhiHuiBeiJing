@@ -24,15 +24,16 @@ import butterknife.Unbinder;
  */
 public abstract class BaseFragment extends Fragment {
     @BindView(R.id.ib_menu)
-    ImageButton mIbMenu;
+    public ImageButton mIbMenu;
     @BindView(R.id.tv_title)
-    TextView mTvTitle;
+    public TextView mTvTitle;
     @BindView(R.id.ib_pic_type)
-    ImageButton mIbPicType;
+    public ImageButton mIbPicType;
     @BindView(R.id.container)
-    FrameLayout mContainer;
+    public FrameLayout mContainer;
     Unbinder unbinder;
-
+    //是否加载数据
+    public boolean hasLoadData;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -52,7 +53,6 @@ public abstract class BaseFragment extends Fragment {
 
     //设置Menu的显示状态
     public void setIbMenuDisplayState(boolean isShow) {
-//        mIbMenu.setVisibility(isShow ? View.VISIBLE : View.GONE);
         mIbMenu.setVisibility(isShow ? View.VISIBLE : View.GONE);
     }
 

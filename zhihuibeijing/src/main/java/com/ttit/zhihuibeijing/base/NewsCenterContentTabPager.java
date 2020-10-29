@@ -1,9 +1,11 @@
 package com.ttit.zhihuibeijing.base;
 
 import android.content.Context;
-import android.net.Uri;
+import android.graphics.Color;
 import android.os.Handler;
 import android.support.v4.view.ViewPager;
+import android.support.v7.widget.LinearLayoutManager;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -13,9 +15,16 @@ import android.widget.TextView;
 import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
 import com.ttit.zhihuibeijing.R;
+import com.ttit.zhihuibeijing.adapter.NewsListAdapter;
 import com.ttit.zhihuibeijing.adapter.SwitchImageVPAdapter;
 import com.ttit.zhihuibeijing.bean.NewsCenterTabBean;
+import com.ttit.zhihuibeijing.utils.bitmap.CacheUtils;
+import com.ttit.zhihuibeijing.utils.Constant;
+import com.ttit.zhihuibeijing.utils.MyLogger;
 import com.ttit.zhihuibeijing.utils.MyToast;
+import com.ttit.zhihuibeijing.view.RecyclerViewDivider;
+import com.ttit.zhihuibeijing.view.RefreshRecyclerView;
+import com.ttit.zhihuibeijing.view.SwitchImageViewViewPager;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.StringCallback;
 
@@ -29,13 +38,12 @@ import okhttp3.Call;
 /**
  * Created by JW.S on 2020/10/4 8:26 PM.
  */
-public class NewsCenterContentTabPager implements ViewPager.OnPageChangeListener {
-    @BindView(R.id.vp_switch_image)
-    com.ttit.zhihuibeijing.view.SwitchImageViewViewPager vpSwitchImage;
-    @BindView(R.id.tv_title)
+public class NewsCenterContentTabPager implements ViewPager.OnPageChangeListener, RefreshRecyclerView.OnRefreshListener, RefreshRecyclerView.OnLoadMoreListener {
+    SwitchImageViewViewPager vpSwitchImage;
     TextView tvTitle;
-    @BindView(R.id.ll_point_container)
     LinearLayout llPointContainer;
+    @BindView(R.id.rvNews)
+    RefreshRecyclerView rvNews;
     private Context context;
     public View view;
     private NewsCenterTabBean newsCenterTabBean;
@@ -44,6 +52,7 @@ public class NewsCenterContentTabPager implements ViewPager.OnPageChangeListener
     private Handler mHandler = new Handler();
     //判断是否在切换
     private boolean hasWitch;
+    private static final String TAG = "NewsCenterContentTabPager";
 
     public NewsCenterContentTabPager(Context context) {
         this.context = context;
@@ -57,7 +66,7 @@ public class NewsCenterContentTabPager implements ViewPager.OnPageChangeListener
     }
 
     //网络加载数据
-    public void loadNetData(String url) {
+    public void loadNetData(final String url) {
         OkHttpUtils.get()
                 .url(url)
                 .build()
@@ -65,12 +74,27 @@ public class NewsCenterContentTabPager implements ViewPager.OnPageChangeListener
                     @Override
                     public void onError(Call call, Exception e, int id) {
                         MyToast.show(context, "新闻中心子Tab数据加载失败");
+                        //读取缓存
+                        try {
+                            String json = CacheUtils.readCache(context, url);
+                            if (!TextUtils.isEmpty(json)) {
+                                processData(json);
+                            }
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                        }
                     }
 
                     @Override
                     public void onResponse(String response, int id) {
-                        //解析数据
+                        MyLogger.i(TAG, response);
                         processData(response);
+                        //缓存数据
+                        try {
+                            CacheUtils.saveCache(context, url, response);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     }
                 });
     }
@@ -80,15 +104,42 @@ public class NewsCenterContentTabPager implements ViewPager.OnPageChangeListener
         newsCenterTabBean = gson.fromJson(response, NewsCenterTabBean.class);
         //把数据绑定给对应的控件
         bindDataToView();
-
         //把当前的NewsCenterContentTabPager对象传递给SwitchImageViewViewPager
         vpSwitchImage.setTabPager(this);
     }
 
     //绑定数据给控件
     private void bindDataToView() {
+        loadSwitchImageViewLayout();
         initSwitchImageView();
         initPoint();
+        initRvNews();
+    }
+
+    //动态加载轮播图的布局
+    private void loadSwitchImageViewLayout() {
+        View view = LayoutInflater.from(context).inflate(R.layout.switch_imageview, null);
+        //手动初始化控件
+        vpSwitchImage = view.findViewById(R.id.vp_switch_image);
+        tvTitle = view.findViewById(R.id.tv_title);
+        llPointContainer = view.findViewById(R.id.ll_point_container);
+        //把轮播图添加给RefreshRecyclerView
+        rvNews.addSwitchImageView(view);
+    }
+
+    //初始化新闻列表
+    private void initRvNews() {
+        //设置布局管理器
+        rvNews.setLayoutManager(new LinearLayoutManager(context));
+        //设置条目的分割线
+        rvNews.addItemDecoration(new RecyclerViewDivider(context, LinearLayoutManager.HORIZONTAL, 1, Color.BLACK));
+        //创建Adapter,设置adapter
+        NewsListAdapter newsListAdapter = new NewsListAdapter(context, newsCenterTabBean.data.news);
+        rvNews.setAdapter(newsListAdapter);
+        //设置下拉刷新的监听
+        rvNews.setOnRefreshListener(this);
+        //设置上拉加载的监听
+        rvNews.setOnLoadMoreListener(this);
     }
 
     //加载图片，并绑定到Viewpager上
@@ -156,6 +207,60 @@ public class NewsCenterContentTabPager implements ViewPager.OnPageChangeListener
             //往Handler里面的消息队列里面发送一个延时的消息
             mHandler.postDelayed(new SwitchTask(), 3000);
         }
+    }
+
+    /**
+     * 加载最新的数据
+     */
+    @Override
+    public void onRefresh() {
+        OkHttpUtils.get()
+                .url(Constant.HOST + newsCenterTabBean.data.more)
+                .build()
+                .execute(new StringCallback() {
+                    @Override
+                    public void onError(Call call, Exception e, int id) {
+                        MyLogger.d(TAG, "互联网获取数据失败!");
+                        //隐藏头
+                        rvNews.hideHeaderView(false);
+                        //让轮播图继续切换
+                        startSwitch();
+                    }
+
+                    @Override
+                    public void onResponse(String response, int id) {
+                        //隐藏头
+                        Gson gson = new Gson();
+                        NewsCenterTabBean tabBean = gson.fromJson(response, NewsCenterTabBean.class);
+                        newsCenterTabBean.data.news.addAll(0, tabBean.data.news);
+                        rvNews.hideHeaderView(true);
+                        //让轮播图继续切换
+                        startSwitch();
+                    }
+                });
+    }
+
+    @Override
+    public void onLoadMore() {
+        OkHttpUtils.get()
+                .url(Constant.HOST + newsCenterTabBean.data.more)
+                .build()
+                .execute(new StringCallback() {
+                    @Override
+                    public void onError(Call call, Exception e, int id) {
+                        MyLogger.d(TAG, "联网获取数据失败!");
+                        rvNews.hideFooterView();
+                    }
+
+                    @Override
+                    public void onResponse(String response, int id) {
+                        Gson gson = new Gson();
+                        NewsCenterTabBean tabBean = gson.fromJson(response, NewsCenterTabBean.class);
+                        newsCenterTabBean.data.news.addAll(tabBean.data.news);
+                        //隐藏脚
+                        rvNews.hideFooterView();
+                    }
+                });
     }
 
     private class SwitchTask implements Runnable {

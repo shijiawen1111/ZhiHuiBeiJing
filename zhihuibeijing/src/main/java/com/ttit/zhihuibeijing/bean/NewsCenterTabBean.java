@@ -51,7 +51,7 @@ public class NewsCenterTabBean {
         public boolean comment;
         public String commentlist;
         public String commenturl;
-        public int id;
+        public String id;
         public String listimage;
         public String pubdate;
         public String title;

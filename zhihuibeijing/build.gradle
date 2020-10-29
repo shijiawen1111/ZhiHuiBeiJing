@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'com.mob.sdk'
 android {
     compileSdkVersion 29
     buildToolsVersion "29.0.3"
@@ -22,7 +23,6 @@ android {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.android.support.constraint:constraint-layout:2.0.1'
     implementation 'com.android.support:appcompat-v7:28.0.0'
     testImplementation 'junit:junit:4.12'
@@ -38,4 +38,72 @@ dependencies {
     implementation 'com.jakewharton:butterknife:8.8.1'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
     implementation project(path: ':library_viewpagerindicators')
+}
+
+MobSDK {
+    appKey "1bf5da5f92574"
+    appSecret "fa047b39f1413c7846978a2bb0577fed"
+
+    ShareSDK {
+        loopShare true
+        devInfo {
+            SinaWeibo {
+                appKey "568898243123"
+                appSecret "38a4f8204cc784f81f9f0daaf31e02e3123"
+                callbackUri "http://www.sharesdk.cn"
+            }
+            Wechat {
+                appId "wx4868b35061f87885123"
+                appSecret "64020361b8ec4c99936c0e3999a9f249123"
+                userName "gh_afb25ac019c9"
+                path "pages/index/index.html?id=1"
+                withShareTicket true
+                miniprogramType 2
+            }
+            QQ {
+                appId "100371282123"
+                appKey "aed9b0303e3ed1e27bae87c33761161d123"
+            }
+            Facebook {
+                appKey "1412473428822331123"
+                appSecret "a42f4f3f867dc947b9ed6020c2e93558123"
+                callbackUri "https://mob.com"
+            }
+            Twitter {
+                appKey "LRBM0H75rWrU9gNHvlEAA2aOy123"
+                appSecret "gbeWsZvA9ELJSdoBzJ5oLKX0TU09UOwrzdGfo9Tg7DjyGuMe8G123"
+                callbackUri "http://mob.com"
+            }
+            ShortMessage {
+                enable true
+            }
+            LinkedIn {
+                appKey "ejo5ibkye3vo123"
+                appSecret "cC7B2jpxITqPLZ5M123"
+                callbackUri "http://www.sharesdk.cn"
+            }
+            Douyin {
+                appKey "aw9ivykfjvi4hpwo123"
+                appSecret "42b4caa6bda60bd49f05f06d0a4956e1123"
+            }
+            FacebookMessenger {
+                appId "107704292745179123"
+            }
+            WhatsApp {
+                enable true
+            }
+            WechatMoments {
+                appId "wx4868b35061f87885123"
+                appSecret "64020361b8ec4c99936c0e3999a9f249123"
+            }
+            WechatFavorite {
+                appId "wx4868b35061f87885123"
+                appSecret "64020361b8ec4c99936c0e3999a9f249123"
+            }
+            QZone {
+                appId "100371282123"
+                appKey "aed9b0303e3ed1e27bae87c33761161d123"
+            }
+        }
+    }
 }

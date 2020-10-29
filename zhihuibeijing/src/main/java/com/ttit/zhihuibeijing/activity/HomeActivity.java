@@ -54,7 +54,7 @@ public class HomeActivity extends AppCompatActivity implements RadioGroup.OnChec
     //侧滑菜单的数据
     private HomeMenuAdaper menuAdapter;
 
-    public void setNewsCenterSMenuList(List<NewsCenterBean.NewsCenterMenuBean> newsCenterMenuBeanList) {
+    public void setNewsCenterMenuBeanList(List<NewsCenterBean.NewsCenterMenuBean> newsCenterMenuBeanList) {
         this.newsCenterMenuBeanLists = newsCenterMenuBeanList;
         menuAdapter.setNewsCenterMenuBeanList(newsCenterMenuBeanLists);
         MyLogger.d(TAG, String.valueOf(newsCenterMenuBeanLists.size()));
@@ -90,7 +90,7 @@ public class HomeActivity extends AppCompatActivity implements RadioGroup.OnChec
         //设置侧滑菜单，默认不可以滑出
         mSlidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_NONE);
         //设置侧滑菜单滑出后，主界面的宽度
-        mSlidingMenu.setBehindOffset(1000);
+        mSlidingMenu.setBehindOffset(500);
         //以内容的形式添加到Activity
         mSlidingMenu.attachToActivity(this, SlidingMenu.SLIDING_CONTENT);
         //设置侧滑菜单的布局
@@ -110,7 +110,10 @@ public class HomeActivity extends AppCompatActivity implements RadioGroup.OnChec
         fragments.add(new SettingFragment());
         HomeVPFragmentAdapter adapter = new HomeVPFragmentAdapter(getSupportFragmentManager(), fragments);
         mVp.setAdapter(adapter);
-
+        //ViewPager的setOffscreenPageLimit(5)
+        //如果指定的数值为5，ViewPager会缓存当前Fragment左右各5Fragment。
+        //这是ViewPager的预加载机制
+        mVp.setOffscreenPageLimit(5);
         //给ViewPager设置页面滑动改变监听
         mVp.addOnPageChangeListener(this);
     }
@@ -171,8 +174,8 @@ public class HomeActivity extends AppCompatActivity implements RadioGroup.OnChec
         mVp.setCurrentItem(item, false);//false 不需要Viewpager页面切换的时候有滑动的动画
 
         //加载网络数据的入口
-        BaseFragment baseFragment = (BaseFragment) fragments.get(item);
-        if (baseFragment instanceof BaseLoadNetDataOperator) {
+        BaseFragment baseFragment = (BaseFragment) fragments.get(item);//获取到对应的Fragment页面
+        if (baseFragment instanceof BaseLoadNetDataOperator && !baseFragment.hasLoadData) {
             ((BaseLoadNetDataOperator) baseFragment).loadNetData();
         }
     }

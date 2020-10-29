@@ -2,6 +2,7 @@ package com.ttit.zhihuibeijing.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.renderscript.Double2;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -18,6 +19,7 @@ import com.ttit.zhihuibeijing.adapter.GuideVpAdpter;
 import com.ttit.zhihuibeijing.utils.Constant;
 import com.ttit.zhihuibeijing.utils.MyLogger;
 import com.ttit.zhihuibeijing.utils.SPUtils;
+import com.ttit.zhihuibeijing.utils.bitmap.Dp2PxUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -75,7 +77,8 @@ public class GuideActivity extends AppCompatActivity implements ViewPager.OnPage
         for (int resId : imgs) {
             View view = new View(this);
             view.setBackgroundResource(R.drawable.point_gray_bg);
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(30, 30);
+            int width = Dp2PxUtils.dip2px(this, 30f);
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(width, width);
             params.rightMargin = 20;
             mLLContainerGrayPoint.addView(view, params);
         }
