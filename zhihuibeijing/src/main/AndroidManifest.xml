@@ -1,11 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.ttit.zhihuibeijing"
     android:versionCode="316"
     android:versionName="3.1.6">
 
-    <uses-sdk
-        android:targetSdkVersion="29" />
+    <uses-sdk android:targetSdkVersion="29" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <!-- 访问当前网络状态权限 -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <!-- 获取手机信息 -->
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS" />
+    <uses-permission android:name="android.permission.DOWNLOAD_WITHOUT_NOTIFICATION" />
+    <!--2017.5.27 极光推送权限 ym start-->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.RECEIVE_USER_PRESENT" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_SETTINGS" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+
+    <permission
+        android:name="com.ttit.zhihuibeijing.permission.JPUSH_MESSAGE"
+        android:protectionLevel="signature" />
+    <uses-permission android:name="com.ttit.zhihuibeijing.permission.JPUSH_MESSAGE" />
     <application
 
         android:allowBackup="true"
@@ -16,7 +38,16 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <!--配置TabPagerIndicator主题样式-->
+        <!-- Since JCore2.0.0 Required SDK核心功能-->
+        <!-- 这个Service要继承JCommonService -->
+        <service
+            android:name="com.ttit.zhihuibeijing.service.JpushService"
+            android:process=":pushcore">
+            <intent-filter>
+                <action android:name="cn.jiguang.user.service.action" />
+            </intent-filter>
+        </service>
+
         <activity
             android:name=".activity.SplashActivity"
             android:configChanges="orientation|screenSize">
@@ -30,5 +61,4 @@
         <activity android:name=".activity.GuideActivity" />
         <activity android:name=".activity.NewsDetailActivity" />
     </application>
-
 </manifest>

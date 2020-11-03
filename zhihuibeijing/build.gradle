@@ -6,6 +6,20 @@ android {
 
     defaultConfig {
         applicationId "com.ttit.zhihuibeijing"
+
+        ndk {
+            //选择要添加的对应cpu类型的.so库。
+//            abiFilters 'armeabi', 'armeabi-v7a', 'armeabi-v8a'
+            // 还可以添加 'x86', 'x86_64', 'mips', 'mips64'
+            abiFilters 'x86', 'x86_64', 'mips', 'mips64'
+        }
+
+        manifestPlaceholders = [
+                JPUSH_PKGNAME : applicationId,
+                JPUSH_APPKEY : "09a4eec2647fd84b2ba90524", //JPush上注册的包名对应的appkey.
+                JPUSH_CHANNEL : "developer-default", //暂时填写默认值即可.
+        ]
+
         minSdkVersion 16
         targetSdkVersion 29
         versionCode 1
@@ -38,6 +52,9 @@ dependencies {
     implementation 'com.jakewharton:butterknife:8.8.1'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
     implementation project(path: ':library_viewpagerindicators')
+//    极光推送依赖
+    implementation 'cn.jiguang.sdk:jmessage:2.9.2'  // 此处以JMessage 2.9.2 版本为例。
+    implementation 'cn.jiguang.sdk:jcore:2.3.0'  // 此处以JCore 2.3.0 版本为例。
 }
 
 MobSDK {

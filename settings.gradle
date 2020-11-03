@@ -1,4 +1,4 @@
 rootProject.name='ZhiHuiBeiJing'
-include ':zhihuibeijing', ':library_slidingmenu', ':library_viewpagerindicators', ':demo'
+include ':zhihuibeijing', ':library_slidingmenu', ':library_viewpagerindicators'
 include ':textrecycleview'
 project(':library_viewpagerindicators').projectDir = new File('library_viewpagerindicator')

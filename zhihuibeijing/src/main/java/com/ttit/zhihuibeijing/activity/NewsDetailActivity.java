@@ -113,7 +113,6 @@ public class NewsDetailActivity extends AppCompatActivity {
                 })
                 .setNegativeButton("取消", null)
                 .show();
-
     }
 
     private void showShare() {
